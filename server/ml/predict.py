@@ -1,8 +1,9 @@
 import torch
 import torch.nn as nn
 import re
+import os
 
-# 1. Recreate the same model architecture (MANDATORY for loading weights)
+# 1. Architecture (Exact copy from training)
 class LSTMClassifier(nn.Module):
     def __init__(self, vocab_size, embed_dim, hidden_dim, extra_feat_dim):
         super(LSTMClassifier, self).__init__()
@@ -20,25 +21,28 @@ class LSTMClassifier(nn.Module):
         combined = torch.cat((text_features, extra_features), dim=1)
         return self.fc(combined)
 
-# --- LOAD PROCESS (Using your specific logic) ---
+# --- LOAD PROCESS ---
 
-# Load checkpoint with weights_only=False to fix the error you saw
-checkpoint = torch.load("ml/job_classifier_v1.pth", weights_only=False, map_location="cpu")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "job_classifier_v1.pth")
 
-# Load vocab and threshold first to initialize the model correctly
+# Load checkpoint
+checkpoint = torch.load(MODEL_PATH, weights_only=False, map_location="cpu")
+
+# Extract metadata
 vocab = checkpoint["vocab"]
 THRESHOLD = checkpoint["threshold"]
 
+# !!! THE MISSING INITIALIZATION STEPS !!!
 model = LSTMClassifier(
     vocab_size=len(vocab),
     embed_dim=128,
     hidden_dim=128,
-    extra_feat_dim=3  # Standard for [telecommuting, logo, questions]
+    extra_feat_dim=3 
 )
-
-# Load weights
 model.load_state_dict(checkpoint["model_state_dict"])
-model.eval()
+model.eval() 
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 print("✅ Model loaded and ready for inference")
 print(f"Loaded threshold: {THRESHOLD}")
@@ -46,18 +50,13 @@ print(f"Loaded threshold: {THRESHOLD}")
 # --- PREDICTION LOGIC ---
 
 def tokenize(text):
-    # Simple regex-based tokenization since you don't want NLTK
     return re.sub(r'\W+', ' ', text.lower()).split()
 
 def predict(text, extra_features):
-    """
-    Returns prediction info formatted for your JS client.
-    """
     # 1. Encode text
     encoded = [vocab.get(word, vocab.get("<UNK>", 1)) for word in tokenize(text)]
     text_tensor = torch.tensor([encoded])
-    text_tensor = torch.nn.utils.rnn.pad_sequence(text_tensor, batch_first=True, padding_value=0)
-
+    
     # 2. Extra features
     extra_tensor = torch.tensor([extra_features], dtype=torch.float32)
 
@@ -68,7 +67,6 @@ def predict(text, extra_features):
         prob_real = 1 - prob_fake
         pred_class = int(prob_fake >= THRESHOLD)
 
-    # 4. Map class to label and determine risk (for your HTML spans)
     label_map = {0: "Real Job Posting", 1: "Fake Job Posting"}
     
     if pred_class == 1:
@@ -83,6 +81,6 @@ def predict(text, extra_features):
         "label": label_map[pred_class],
         "prob_real": round(prob_real * 100, 2),
         "prob_fake": round(prob_fake * 100, 2),
-        "probability": round(prob_fake * 100, 2), # Key for existing script.js
+        "probability": round(prob_fake * 100, 2), 
         "risk": risk
     }

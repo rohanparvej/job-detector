@@ -41,7 +41,7 @@ Once the model is generated and CORS is configured, start the backend and fronte
 ---
 
 ## 🌐 Demo
-The live demo is currently being finalized. **Stay tuned—link coming soon!**
+The first beta version is here! Check out-> https://job-detector.pages.dev
 
 ---
 

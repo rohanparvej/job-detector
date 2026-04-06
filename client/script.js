@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const fakeProbEl = document.getElementById("fakeProb");
     const riskEl = document.getElementById("risk");
     // Add this at the top of your script
-    fetch("http://127.0.0.1:8000/")
+    fetch("https://job-detector.onrender.com")
     .then(res => res.json())
     .then(data => console.log("Backend Status:", data.status))
     .catch(err => console.error("Backend is offline"));
@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
         detectBtn.disabled = true;
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/predict", {
+            const response = await fetch("https://job-detector.onrender.com/predict", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

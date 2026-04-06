@@ -14,7 +14,7 @@ app = FastAPI()
 # THIS IS THE FIX FOR THE CORS ERROR
 origins = ["http://localhost:5500",          # For local testing (Live Server)
     "http://127.0.0.1:5500",         # For local testing
-    "https://job-detector.pages.dev/" # Your ACTUAL Cloudflare URL
+    "https://job-detector.pages.dev" # Your ACTUAL Cloudflare URL
 ]
 app.add_middleware(
     CORSMiddleware,

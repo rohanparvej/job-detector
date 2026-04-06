@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const fakeProbEl = document.getElementById("fakeProb");
     const riskEl = document.getElementById("risk");
     // Add this at the top of your script
-    fetch("https://job-detector.onrender.com")
+    fetch("https://job-detector.onrender.com/")
     .then(res => res.json())
     .then(data => console.log("Backend Status:", data.status))
     .catch(err => console.error("Backend is offline"));

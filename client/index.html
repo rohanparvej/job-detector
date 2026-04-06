@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detect Fake Jobs</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>🕵️ Fake Job Detector</h1>
+
+        <!-- Input Section -->
+        <div class="input-section">
+            <label for="jobText">Paste Job Description:</label>
+            <textarea id="jobText" placeholder="Enter job posting text here..."></textarea>
+        </div>
+        <div class="features">
+            <label><input type="checkbox" id="telecommuting"> Remote?</label>
+            <label><input type="checkbox" id="hasLogo"> Company Logo?</label>
+            <label><input type="checkbox" id="hasQuestions"> Has Questions?</label>
+        </div>
+        <!-- Button -->
+        <button class="detect-btn">Detect</button>
+
+        <!-- Result Section -->
+        <div class="result-box">
+            <h2>🔹 Analysis Result</h2>
+
+            <p><strong>Prediction:</strong> <span id="prediction"></span></p>
+
+            <p>
+                <strong>Confidence:</strong><br>
+                Real: <span id="realProb">%</span><br>
+                Fake: <span id="fakeProb">%</span>
+            </p>
+
+            <p><strong>Risk Level:</strong> <span id="risk"></span></p>
+        </div>
+        
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

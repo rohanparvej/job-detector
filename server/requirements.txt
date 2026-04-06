@@ -1,5 +1,5 @@
 fastapi
 uvicorn
-torch
+--find-links https://download.pytorch.org/whl/cpu
 numpy
 scikit-learn

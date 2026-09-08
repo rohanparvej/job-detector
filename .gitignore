@@ -1,0 +1,30 @@
+# Virtual Environments (uv & venv)
+.venv/
+venv/
+ENV/
+env/
+
+# Environment & Secret Files
+.env
+.env.*
+!.env.example
+
+# Python Cache & Compiled Files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# PyTorch Models & Large ML Artifacts
+*.pth
+*.pt
+*.bin
+*.onnx
+
+# IDEs & System Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

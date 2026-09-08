@@ -31,9 +31,16 @@ checkpoint = torch.load(MODEL_PATH, weights_only=False, map_location="cpu")
 
 # Extract metadata
 vocab = checkpoint["vocab"]
-THRESHOLD = checkpoint["threshold"]
+THRESHOLD = float(checkpoint["threshold"])
 
-# !!! THE MISSING INITIALIZATION STEPS !!!
+# Helper to ensure token IDs are raw integers
+def get_token_id(val):
+    if isinstance(val, dict):
+        return int(val.get("id", val.get("index", 1)))
+    return int(val)
+
+unk_id = get_token_id(vocab.get("<UNK>", 1))
+
 model = LSTMClassifier(
     vocab_size=len(vocab),
     embed_dim=128,
@@ -42,7 +49,6 @@ model = LSTMClassifier(
 )
 model.load_state_dict(checkpoint["model_state_dict"])
 model.eval() 
-# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 print("✅ Model loaded and ready for inference")
 print(f"Loaded threshold: {THRESHOLD}")
@@ -53,9 +59,17 @@ def tokenize(text):
     return re.sub(r'\W+', ' ', text.lower()).split()
 
 def predict(text, extra_features):
-    # 1. Encode text
-    encoded = [vocab.get(word, vocab.get("<UNK>", 1)) for word in tokenize(text)]
-    text_tensor = torch.tensor([encoded])
+    # 1. Encode text ensuring integer outputs
+    encoded = []
+    for word in tokenize(text):
+        val = vocab.get(word, unk_id)
+        encoded.append(get_token_id(val))
+
+    # Handle empty text input edge case
+    if not encoded:
+        encoded = [unk_id]
+
+    text_tensor = torch.tensor([encoded], dtype=torch.long)
     
     # 2. Extra features
     extra_tensor = torch.tensor([extra_features], dtype=torch.float32)
@@ -64,7 +78,7 @@ def predict(text, extra_features):
     with torch.no_grad():
         output = model(text_tensor, extra_tensor)
         prob_fake = torch.sigmoid(output).item()
-        prob_real = 1 - prob_fake
+        prob_real = 1.0 - prob_fake
         pred_class = int(prob_fake >= THRESHOLD)
 
     label_map = {0: "Real Job Posting", 1: "Fake Job Posting"}

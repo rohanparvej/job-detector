@@ -7,11 +7,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const realProbEl = document.getElementById("realProb");
     const fakeProbEl = document.getElementById("fakeProb");
     const riskEl = document.getElementById("risk");
-    // Add this at the top of your script
-    fetch("https://job-detector.onrender.com/")
-    .then(res => res.json())
-    .then(data => console.log("Backend Status:", data.status))
-    .catch(err => console.error("Backend is offline"));
+
+    // Check backend health using the new /health route
+    fetch("/health")
+        .then(res => res.json())
+        .then(data => console.log("Backend Status:", data.status))
+        .catch(err => console.error("Backend is offline"));
+
     detectBtn.addEventListener("click", async () => {
         const text = jobTextInput.value.trim();
 
@@ -20,12 +22,12 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Show a loading state
         detectBtn.textContent = "Analyzing...";
         detectBtn.disabled = true;
 
         try {
-            const response = await fetch("https://job-detector.onrender.com/predict", {
+            // Use a relative path since frontend and backend are bundled
+            const response = await fetch("/predict", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -41,24 +43,18 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             if (!response.ok) {
-                throw new Error("Server error. Make sure FastAPI is running.");
+                throw new Error("Server error. Make sure your backend is running.");
             }
 
             const data = await response.json();
 
-            // Update the UI with the response from FastAPI
             predictionEl.textContent = data.label;
-            
-            // Calculate probabilities for the display
-            // (Assuming data.probability is the 'Fake' probability)
             const fakeVal = data.probability;
             const realVal = (100 - fakeVal).toFixed(2);
 
             realProbEl.textContent = `${realVal}%`;
             fakeProbEl.textContent = `${fakeVal}%`;
             riskEl.textContent = data.risk;
-
-            // Optional: Change color based on prediction
             predictionEl.style.color = data.prediction === 1 ? "#e74c3c" : "#2ecc71";
 
         } catch (error) {

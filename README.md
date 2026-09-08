@@ -1,6 +1,6 @@
 # Fake vs Real Job Detector
 
-This application uses machine learning to identify fraudulent job postings by analyzing patterns in descriptions and metadata. It provides a probability score to help users distinguish between legitimate opportunities and potential scams.
+This application uses machine learning to identify fraudulent job postings by analyzing patterns in descriptions and metadata. It provides a probability score to help users distinguish between legitimate opportunities and potential scams. The deployed server has been turned off for maintenance will be up in due time.
 
 ---
 
